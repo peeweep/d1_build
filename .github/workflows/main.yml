@@ -1,8 +1,6 @@
 name: Auto Build Lichee RV Debian Linux Bootable Image.
 on:
   push:
-    tags:
-      - '*'
 jobs:
   build-all-os:
     runs-on: ubuntu-latest
@@ -15,7 +13,6 @@ jobs:
         - name: Prepare
           run: |
             echo ${{runner.workspace}}
-            mkdir -p lichee_rv_86
             mkdir -p lichee_rv_dock
         - name: Build
           run: |
@@ -25,15 +22,8 @@ jobs:
           run: |
             docker-compose up dock
             ls -l lichee_rv_dock/*
-        - name: Create Lichee RV 86 panel Image
-          run: |
-            docker-compose up panel
-            ls -l lichee_rv_86/*
-        - name: Release
-          uses: softprops/action-gh-release@v1
-          if: startsWith(github.ref, 'refs/tags/')
+
+        - name: Upload image
+          uses: actions/upload-artifact@v3
           with:
-            files: |
-              lichee_rv_86/lichee_rv_86*.img.xz
-              lichee_rv_dock/lichee_rv_dock*.img.xz
-              README.txt
+            path: lichee_rv_dock/lichee_rv_dock*.img.xz
